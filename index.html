@@ -18,7 +18,7 @@
       <p class="kicker">Resume</p>
       <h1>王先生</h1>
       <p class="role">简历访问</p>
-      <p>请输入访问密码。密码由候选人单独提供，不会写在链接里。打开后可预览完整版，并下载 PDF。</p>
+      <p>请输入访问密码。密码由候选人单独提供，不会写在链接里。打开后可预览完整版和简版，并分别下载 PDF。</p>
       <label for="password">访问密码</label>
       <input id="password" name="password" type="password" autocomplete="current-password" required>
       <button type="submit">打开简历</button>
@@ -31,7 +31,8 @@
       <button type="button" id="show-full" class="is-active">完整版</button>
       <button type="button" id="show-brief">简版 · 招聘平台</button>
       <a id="download" href="#">下载完整版 PDF</a>
-      <p id="hint">完整版与附件一致，供人事预览和下载。</p>
+      <a id="download-brief" href="#">下载简版 PDF</a>
+      <p id="hint">完整版与附件一致。两份 PDF 都可以下载。</p>
       <button type="button" id="lock">锁定</button>
     </div>
     <div id="resume"></div>
@@ -45,12 +46,14 @@
     const resume = document.querySelector("#resume");
     const hint = document.querySelector("#hint");
     const download = document.querySelector("#download");
+    const downloadBrief = document.querySelector("#download-brief");
     const showFull = document.querySelector("#show-full");
     const showBrief = document.querySelector("#show-brief");
     let pack;
     let fullHtml = "";
     let briefHtml = "";
     let pdfUrl = "";
+    let briefPdfUrl = "";
 
     function bytesFrom(b64) {
       const bin = atob(b64);
@@ -90,8 +93,8 @@
       showFull.classList.toggle("is-active", view !== "brief");
       showBrief.classList.toggle("is-active", view === "brief");
       hint.textContent = view === "brief"
-        ? "简版供 Boss 直聘等招聘平台使用。下载文件仍是完整版。"
-        : "完整版与附件一致，供人事预览和下载。";
+        ? "简版供 Boss 直聘等招聘平台使用，可单独下载。"
+        : "完整版与附件一致。两份 PDF 都可以下载。";
       window.scrollTo(0, 0);
     }
 
@@ -101,10 +104,15 @@
       fullHtml = new TextDecoder().decode(await decrypt(key, pack.full));
       briefHtml = new TextDecoder().decode(await decrypt(key, pack.brief));
       const pdfBytes = await decrypt(key, pack.pdf);
+      const briefPdfBytes = await decrypt(key, pack.briefPdf);
       if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+      if (briefPdfUrl) URL.revokeObjectURL(briefPdfUrl);
       pdfUrl = URL.createObjectURL(new Blob([pdfBytes], { type: "application/pdf" }));
+      briefPdfUrl = URL.createObjectURL(new Blob([briefPdfBytes], { type: "application/pdf" }));
       download.href = pdfUrl;
       download.download = pack.pdf.filename;
+      downloadBrief.href = briefPdfUrl;
+      downloadBrief.download = pack.briefPdf.filename;
       sessionStorage.setItem("resume-password", password);
       gate.classList.add("is-hidden");
       viewer.classList.remove("is-hidden");

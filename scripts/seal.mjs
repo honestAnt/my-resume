@@ -46,35 +46,37 @@ async function encrypt(key, bytes) {
 
 const full = await readFile(path.join(root, "private/full-fragment.html"));
 const brief = await readFile(path.join(root, "private/brief-fragment.html"));
-const printHtml = `<!DOCTYPE html>
+
+async function renderPdf(fragment, filename) {
+  const printHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>王先生简历</title>
+  <title>${filename}</title>
   <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-${full.toString("utf8")}
+${fragment.toString("utf8")}
 </body>
 </html>
 `;
-const printPath = path.join(root, "private/print.html");
-const pdfPath = path.join(root, "private/王先生-简历-完整版.pdf");
-await writeFile(printPath, printHtml);
-
-const printed = spawnSync(chrome, [
-  "--headless",
-  "--disable-gpu",
-  "--no-pdf-header-footer",
-  "--virtual-time-budget=8000",
-  `--print-to-pdf=${pdfPath}`,
-  printPath,
-], { stdio: "inherit" });
-if (printed.status !== 0) {
-  process.exit(printed.status ?? 1);
+  const printPath = path.join(root, "private/print.html");
+  const pdfPath = path.join(root, "private", filename);
+  await writeFile(printPath, printHtml);
+  const printed = spawnSync(chrome, [
+    "--headless",
+    "--disable-gpu",
+    "--no-pdf-header-footer",
+    "--virtual-time-budget=8000",
+    `--print-to-pdf=${pdfPath}`,
+    printPath,
+  ], { stdio: "inherit" });
+  if (printed.status !== 0) process.exit(printed.status ?? 1);
+  return readFile(pdfPath);
 }
 
-const pdf = await readFile(pdfPath);
+const pdf = await renderPdf(full, "王先生-简历-完整版.pdf");
+const briefPdf = await renderPdf(brief, "王先生-简历-简版.pdf");
 const salt = crypto.getRandomValues(new Uint8Array(16));
 const key = await deriveKey(salt);
 const payload = {
@@ -86,6 +88,10 @@ const payload = {
   pdf: {
     ...(await encrypt(key, pdf)),
     filename: "王先生-简历-完整版.pdf",
+  },
+  briefPdf: {
+    ...(await encrypt(key, briefPdf)),
+    filename: "王先生-简历-简版.pdf",
   },
 };
 await writeFile(path.join(root, "sealed.json"), JSON.stringify(payload));
@@ -105,4 +111,4 @@ const packed = await readFile(path.join(root, "sealed.json"), "utf8");
 if (packed.includes("个人优势") || packed.includes("<address>")) {
   throw new Error("密文中出现了明文");
 }
-console.log(`sealed ok, pdf ${pdf.length} bytes`);
+console.log(`sealed ok, full pdf ${pdf.length} bytes, brief pdf ${briefPdf.length} bytes`);
