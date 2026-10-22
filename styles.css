@@ -278,8 +278,130 @@ footer {
   .skills div { grid-template-columns: 1fr; gap: 2px; }
 }
 
+h4 {
+  margin: 14px 0 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.strengths { margin: 0; padding-left: 1.25em; }
+.strengths li { margin: 8px 0; }
+.strengths strong { display: block; }
+
+.gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.gate form {
+  width: min(420px, 100%);
+  padding: 32px 28px 28px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+}
+
+.gate h1 { font-size: 40px; }
+.gate .role { font-size: 18px; }
+
+.gate p { color: var(--muted); font-size: 14px; }
+
+.gate label {
+  display: block;
+  margin: 18px 0 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.gate input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--ink);
+  font: 16px var(--sans);
+}
+
+.gate button,
+.toolbar button,
+.toolbar a {
+  font-family: var(--sans);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gate button {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.gate button:disabled { opacity: 0.6; cursor: wait; }
+
+.gate .error {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  color: var(--accent);
+}
+
+.viewer.is-hidden,
+.gate.is-hidden { display: none; }
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: min(1120px, calc(100% - 32px));
+  margin: 16px auto 0;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+}
+
+.toolbar p {
+  margin: 0;
+  flex: 1 1 220px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.toolbar button,
+.toolbar a {
+  padding: 6px 12px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.toolbar button.is-active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.toolbar a {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 @media print {
-  body { background: white; font-size: 12px; }
+  body { background: white; font-size: 12px; line-height: 1.55; }
+  .gate, .toolbar { display: none !important; }
   .sheet {
     width: 100%;
     margin: 0;
@@ -297,6 +419,8 @@ footer {
   main { padding: 0; }
   a { color: inherit; text-decoration: none; }
   h1 { font-size: 28px; }
-  section { break-inside: avoid; margin-bottom: 16px; }
-  .job, .project { break-inside: avoid; }
+  section { margin-bottom: 12px; }
+  .job, .project { break-inside: auto; }
 }
+
+@page { size: A4; margin: 12mm; }
