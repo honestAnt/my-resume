@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>王先生 · 简历</title>
-  <meta name="description" content="王先生的简历需要访问密码。">
+  <title>王凤宝 · 简历</title>
+  <meta name="description" content="王凤宝的简历需要访问密码。">
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   <div class="gate" id="gate">
     <form id="unlock">
       <p class="kicker">Resume</p>
-      <h1>王先生</h1>
+      <h1>王凤宝</h1>
       <p class="role">简历访问</p>
       <p>请输入访问密码。密码由候选人单独提供，不会写在链接里。打开后可预览完整版和简版，并分别下载 PDF。</p>
       <label for="password">访问密码</label>
@@ -36,6 +36,13 @@
       <button type="button" id="lock">锁定</button>
     </div>
     <div id="resume"></div>
+    <aside class="outline" id="outline" aria-label="页面大纲">
+      <div class="outline-head">
+        <span class="outline-title">大纲</span>
+        <button type="button" id="outline-toggle" aria-expanded="true" title="收起大纲">»</button>
+      </div>
+      <nav class="outline-nav" id="outline-nav"></nav>
+    </aside>
   </div>
 
   <script>
@@ -49,6 +56,10 @@
     const downloadBrief = document.querySelector("#download-brief");
     const showFull = document.querySelector("#show-full");
     const showBrief = document.querySelector("#show-brief");
+    const outlinePanel = document.querySelector("#outline");
+    const outlineNav = document.querySelector("#outline-nav");
+    const outlineToggle = document.querySelector("#outline-toggle");
+    let outlineItems = [];
     let pack;
     let fullHtml = "";
     let briefHtml = "";
@@ -96,7 +107,59 @@
         ? "简版供 Boss 直聘等招聘平台使用，可单独下载。"
         : "完整版与附件一致。两份 PDF 都可以下载。";
       window.scrollTo(0, 0);
+      syncOutline();
     }
+
+    function syncOutline() {
+      outlineNav.innerHTML = "";
+      outlineItems = Array.from(resume.querySelectorAll("main h2")).map((head) => {
+        const num = head.querySelector("span")?.textContent.trim() ?? "";
+        const label = head.textContent.trim().slice(num.length);
+        const link = document.createElement("a");
+        link.href = "#";
+        const numSpan = document.createElement("span");
+        numSpan.textContent = num;
+        link.append(numSpan, label);
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          head.scrollIntoView({ behavior: "smooth", block: "start" });
+          setActiveOutline(link);
+        });
+        outlineNav.appendChild(link);
+        return { head, link };
+      });
+      updateActiveOutline();
+    }
+
+    function setActiveOutline(link) {
+      outlineNav.querySelectorAll("a").forEach((el) => {
+        el.classList.toggle("is-active", el === link);
+      });
+    }
+
+    function updateActiveOutline() {
+      let current = null;
+      for (const item of outlineItems) {
+        if (item.head.getBoundingClientRect().top <= 110) current = item;
+      }
+      setActiveOutline(current ? current.link : null);
+    }
+
+    outlineToggle.addEventListener("click", () => {
+      const collapsed = outlinePanel.classList.toggle("is-collapsed");
+      outlineToggle.textContent = collapsed ? "«" : "»";
+      outlineToggle.setAttribute("aria-expanded", String(!collapsed));
+      outlineToggle.title = collapsed ? "展开大纲" : "收起大纲";
+    });
+
+    let outlineRaf = 0;
+    window.addEventListener("scroll", () => {
+      if (outlineRaf) return;
+      outlineRaf = requestAnimationFrame(() => {
+        outlineRaf = 0;
+        if (!viewer.classList.contains("is-hidden")) updateActiveOutline();
+      });
+    }, { passive: true });
 
     async function openResume(password) {
       if (!pack) pack = await fetch("sealed.json").then((res) => res.json());

@@ -153,6 +153,8 @@ h2 span {
   letter-spacing: 0.08em;
 }
 
+#resume h2 { scroll-margin-top: 76px; }
+
 .lede {
   margin-top: 0;
   font-size: 16.5px;
@@ -399,9 +401,85 @@ h4 {
   color: #fff;
 }
 
+.outline {
+  position: fixed;
+  top: 84px;
+  right: 12px;
+  z-index: 3;
+  width: 148px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 8px 20px rgba(28, 25, 21, 0.1);
+}
+
+.outline-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 7px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.outline-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+#outline-toggle {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#outline-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+.outline-nav { display: grid; padding: 6px 0; }
+
+.outline-nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  border-left: 2px solid transparent;
+}
+
+.outline-nav a span {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.outline-nav a:hover { color: var(--ink); background: #efe9dc; }
+
+.outline-nav a.is-active {
+  color: var(--ink);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+
+.outline.is-collapsed { width: auto; }
+.outline.is-collapsed .outline-head { border-bottom: 0; padding: 7px; }
+.outline.is-collapsed .outline-nav { display: none; }
+
+@media (max-width: 1280px) { .outline { display: none; } }
+
 @media print {
   body { background: white; font-size: 12px; line-height: 1.55; }
-  .gate, .toolbar { display: none !important; }
+  .gate, .toolbar, .outline { display: none !important; }
   .sheet {
     width: 100%;
     margin: 0;

@@ -75,8 +75,8 @@ ${fragment.toString("utf8")}
   return readFile(pdfPath);
 }
 
-const pdf = await renderPdf(full, "王先生-简历-完整版.pdf");
-const briefPdf = await renderPdf(brief, "王先生-简历-简版.pdf");
+const pdf = await renderPdf(full, "王凤宝-简历-完整版.pdf");
+const briefPdf = await renderPdf(brief, "王凤宝-简历-简版.pdf");
 const salt = crypto.getRandomValues(new Uint8Array(16));
 const key = await deriveKey(salt);
 const payload = {
@@ -87,11 +87,11 @@ const payload = {
   brief: await encrypt(key, brief),
   pdf: {
     ...(await encrypt(key, pdf)),
-    filename: "王先生-简历-完整版.pdf",
+    filename: "王凤宝-简历-完整版.pdf",
   },
   briefPdf: {
     ...(await encrypt(key, briefPdf)),
-    filename: "王先生-简历-简版.pdf",
+    filename: "王凤宝-简历-简版.pdf",
   },
 };
 await writeFile(path.join(root, "sealed.json"), JSON.stringify(payload));
